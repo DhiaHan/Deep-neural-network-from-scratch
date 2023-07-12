@@ -14,10 +14,11 @@ class DeepNeuralNetwork:
         self.softmax = lambda x: np.exp(x) / sum(np.exp(x))
         self.activations, self.derivatives = self.__string_to_function(activations_names)
         mean_squared_error = lambda Y_pred, Y, m: (1/m) * ((Y - Y_pred) ** 2).sum()
-        binary_cross_entropy = lambda Y_pred, Y, m: (-1/m) * (np.dot(Y, np.log(Y_pred)) + np.dot(1-Y, np.log(1-Y_pred)))
+        binary_cross_entropy = lambda Y_pred, Y, m: (-1/m) * (Y*np.log(Y_pred) + (1-Y)*np.log(1-Y_pred)).sum()
         self.loss = eval(loss)
         self.weights = None
         self.L = len(layers)
+        self.losses = []
     
     def __string_to_function(self, activations_names):
         activations_ = []
@@ -90,6 +91,7 @@ class DeepNeuralNetwork:
         for i in range(epochs):
             AL, cache = self.__forward_propagation(X)
             cost = self.loss(AL, Y, m)
+            self.lossed.append(cost)
             gradients = self.__backward_propagation(X, Y, cache)
             self.__update_weights(gradients, learning_rate)
             if (i % print_each == 0) : print("Epoch", i, "Loss", cost)
